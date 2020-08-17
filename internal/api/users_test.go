@@ -9,9 +9,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestGetEmpty(t *testing.T) {
+func TestGetEmptyUsers(t *testing.T) {
 	testUsers := users.Create()
-	handler := UserHandler{
+	handler := GetUsersHandler{
 		Users: &testUsers,
 	}
 
@@ -31,7 +31,7 @@ func TestGetEmpty(t *testing.T) {
 
 func TestGetUsers(t *testing.T) {
 	testUsers := users.Create()
-	handler := UserHandler{
+	handler := GetUsersHandler{
 		Users: &testUsers,
 	}
 

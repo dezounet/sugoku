@@ -20,8 +20,6 @@ Before any commit, install pre-commit hooks:
 pre-commit install
 ```
 
-Inspired from <https://github.com/dnephin/pre-commit-golang>
-
 ### Understand project layout
 
 Inspired from <https://github.com/golang-standards/project-layout>

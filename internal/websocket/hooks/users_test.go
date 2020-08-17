@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestEvents(t *testing.T) {
+func TestUsersEvents(t *testing.T) {
 	users := users.Create()
 	hook := CreateUserHook(&users)
 
@@ -25,7 +25,7 @@ func TestEvents(t *testing.T) {
 	}
 }
 
-func TestOnConnection(t *testing.T) {
+func TestOnUserConnection(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -56,7 +56,7 @@ func TestOnConnection(t *testing.T) {
 	}
 }
 
-func TestOnSecondConnection(t *testing.T) {
+func TestOnUserSecondConnection(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -77,7 +77,7 @@ func TestOnSecondConnection(t *testing.T) {
 	}
 }
 
-func TestOnClose(t *testing.T) {
+func TestOnUserClose(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -104,7 +104,7 @@ func TestOnClose(t *testing.T) {
 	}
 }
 
-func TestOnSecondClose(t *testing.T) {
+func TestOnUserSecondClose(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -121,7 +121,7 @@ func TestOnSecondClose(t *testing.T) {
 	}
 }
 
-func TestOnAddEvent(t *testing.T) {
+func TestOnUserAddEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -150,7 +150,7 @@ func TestOnAddEvent(t *testing.T) {
 	}
 }
 
-func TestOnSecondAddEvent(t *testing.T) {
+func TestOnUserSecondAddEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -180,7 +180,7 @@ func TestOnSecondAddEvent(t *testing.T) {
 	}
 }
 
-func TestOnUpdateEvent(t *testing.T) {
+func TestOnUserUpdateEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -210,7 +210,7 @@ func TestOnUpdateEvent(t *testing.T) {
 	}
 }
 
-func TestOnSecondUpdateEvent(t *testing.T) {
+func TestOnUserSecondUpdateEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -241,7 +241,7 @@ func TestOnSecondUpdateEvent(t *testing.T) {
 	}
 }
 
-func TestOnDelEvent(t *testing.T) {
+func TestUserOnDelEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -266,7 +266,7 @@ func TestOnDelEvent(t *testing.T) {
 	}
 }
 
-func TestOnSecondDelEvent(t *testing.T) {
+func TestOnUserSecondDelEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 	UUID := uuid.New()
@@ -292,7 +292,7 @@ func TestOnSecondDelEvent(t *testing.T) {
 	}
 }
 
-func TestUnknownEvent(t *testing.T) {
+func TestUserUnknownEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 
@@ -310,7 +310,7 @@ func TestUnknownEvent(t *testing.T) {
 	}
 }
 
-func TestMalformedMessage(t *testing.T) {
+func TestUserMalformedMessage(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
 
