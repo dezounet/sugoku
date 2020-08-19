@@ -1,5 +1,7 @@
 # Sugokud
 
+[![CircleCI](https://circleci.com/gh/dezounet/sugokud.svg?style=shield)](https://app.circleci.com/pipelines/github/dezounet/sugokud)
+
 Go daemon serving a multiplayer sudoku game.
 
 ## Build from sources
