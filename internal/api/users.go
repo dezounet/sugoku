@@ -14,15 +14,17 @@ type GetUsersHandler struct {
 }
 
 func (handler *GetUsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	setHeader(w.Header())
+
 	samples := handler.Users.Sample(10)
 
 	json, err := json.Marshal(samples)
 	if err != nil {
-		log.Fatal("Failed getting user samples: ", err)
+		log.Println("Failed getting user samples: ", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError),
 			http.StatusInternalServerError)
 	} else {
-		setHeader(w.Header())
+		log.Println("serving users...")
 		w.Write(json)
 	}
 }

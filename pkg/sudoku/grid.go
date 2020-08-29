@@ -39,7 +39,7 @@ func CreateEmptyGrid(blockSize int) *Grid {
 
 // Reset a grid UUID and its cells
 func (grid *Grid) Reset() {
-	grid.UUID = uuid.New()
+	grid.UUID = uuid.New().String()
 
 	for i := range grid.Cells {
 		for j := range grid.Cells[i] {

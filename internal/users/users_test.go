@@ -17,11 +17,11 @@ func TestCreate(t *testing.T) {
 
 func TestCount(t *testing.T) {
 	users := Create()
-	uuids := make([]uuid.UUID, 10)
+	uuids := make([]string, 10)
 	name := "test"
 
 	for i := 0; i < 10; i++ {
-		uuids[i] = uuid.New()
+		uuids[i] = uuid.New().String()
 	}
 
 	userCount := users.Count()
@@ -46,10 +46,10 @@ func TestCount(t *testing.T) {
 func TestGet(t *testing.T) {
 	users := Create()
 
-	uuids := make([]uuid.UUID, 10)
+	uuids := make([]string, 10)
 	names := make([]string, 10)
 	for i := 0; i < 10; i++ {
-		uuids[i] = uuid.New()
+		uuids[i] = uuid.New().String()
 		names[i] = "test" + strconv.Itoa(i)
 		user := User{
 			UUID: uuids[i],
@@ -71,7 +71,7 @@ func TestGet(t *testing.T) {
 	}
 
 	for i := 0; i < 10; i++ {
-		unknownUUID := uuid.New()
+		unknownUUID := uuid.New().String()
 		if _, ok := users.Get(unknownUUID); ok {
 			t.Error("User", unknownUUID, "shouldn't have been found")
 		}
@@ -80,7 +80,7 @@ func TestGet(t *testing.T) {
 
 func TestAdd(t *testing.T) {
 	users := Create()
-	uuid := uuid.New()
+	uuid := uuid.New().String()
 	name := "test"
 	user := User{
 		UUID: uuid,
@@ -105,7 +105,7 @@ func TestAdd(t *testing.T) {
 
 func TestUpdate(t *testing.T) {
 	users := Create()
-	uuid := uuid.New()
+	uuid := uuid.New().String()
 	name := "test "
 
 	user := User{
@@ -136,7 +136,7 @@ func TestUpdate(t *testing.T) {
 
 func TestRemove(t *testing.T) {
 	users := Create()
-	knownUUID := uuid.New()
+	knownUUID := uuid.New().String()
 	name := "test "
 
 	user := User{
@@ -146,7 +146,7 @@ func TestRemove(t *testing.T) {
 
 	users.AddOrUpdate(user)
 
-	unknownUUUID := uuid.New()
+	unknownUUUID := uuid.New().String()
 	users.Remove(unknownUUUID)
 
 	userCount := users.Count()
@@ -177,10 +177,10 @@ func TestSample(t *testing.T) {
 	users := Create()
 
 	count := 100
-	uuids := make([]uuid.UUID, count)
+	uuids := make([]string, count)
 
 	for i := 0; i < count; i++ {
-		uuids[i] = uuid.New()
+		uuids[i] = uuid.New().String()
 	}
 
 	for i := 1; i < count; i++ {

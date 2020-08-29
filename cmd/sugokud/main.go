@@ -26,6 +26,7 @@ func main() {
 	// Create internal storage struct
 	users := users.Create()
 	grid := sudoku.CreateEmptyGrid(*size)
+	grid.Initialize(sudoku.MEDIUM)
 
 	// Configure API
 	// - websocket

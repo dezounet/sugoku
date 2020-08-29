@@ -15,13 +15,15 @@ type GetGridHandler struct {
 }
 
 func (handler *GetGridHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	setHeader(w.Header())
+
 	json, err := json.Marshal(handler.Grid)
 	if err != nil {
-		log.Fatal("Failed getting grid: ", err)
+		log.Println("Failed getting grid: ", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError),
 			http.StatusInternalServerError)
 	} else {
-		setHeader(w.Header())
+		log.Println("serving grid...")
 		w.Write(json)
 	}
 }
@@ -32,13 +34,15 @@ type GetGridUUIDHandler struct {
 }
 
 func (handler *GetGridUUIDHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	setHeader(w.Header())
+
 	json, err := json.Marshal(handler.Grid.UUID)
 	if err != nil {
-		log.Fatal("Failed getting grid UUID: ", err)
+		log.Println("Failed getting grid UUID: ", err)
 		http.Error(w, http.StatusText(http.StatusInternalServerError),
 			http.StatusInternalServerError)
 	} else {
-		setHeader(w.Header())
+		log.Println("serving grid uuid...")
 		w.Write(json)
 	}
 }
@@ -50,6 +54,8 @@ type GetGridResetHandler struct {
 }
 
 func (handler *GetGridResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	setHeader(w.Header())
+
 	if handler.Grid.IsSolved() {
 		difficultyParams := r.URL.Query().Get("difficulty")
 
@@ -67,11 +73,11 @@ func (handler *GetGridResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		// Send response
 		json, err := json.Marshal("OK")
 		if err != nil {
-			log.Fatal("Failed getting grid UUID: ", err)
+			log.Println("Failed getting grid UUID: ", err)
 			http.Error(w, http.StatusText(http.StatusInternalServerError),
 				http.StatusInternalServerError)
 		} else {
-			setHeader(w.Header())
+			log.Println("resetting grid...")
 			w.Write(json)
 
 			if handler.Broadcast != nil {

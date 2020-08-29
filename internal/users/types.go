@@ -2,18 +2,16 @@ package users
 
 import (
 	"sync"
-
-	"github.com/google/uuid"
 )
 
 // User structure, with UUID and name
 type User struct {
-	UUID uuid.UUID
-	Name string
+	UUID string `json:"uuid"`
+	Name string `json:"name"`
 }
 
 // Users mapped to their UUID
-type Users map[uuid.UUID]User
+type Users map[string]User
 
 // LockableUsers are Users with a safe RWMutex
 type LockableUsers struct {

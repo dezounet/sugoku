@@ -3,7 +3,6 @@ package websocket
 import (
 	"sync"
 
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
 
@@ -24,8 +23,9 @@ const (
 
 // Message structure to share information
 type Message struct {
-	Event Event
-	Data  interface{}
+	Event Event       `json:"event"`
+	UUID  string      `json:"uuid,omitempty"`
+	Data  interface{} `json:"data"`
 }
 
 // LockableConnectionHandler container with a safe RWMutex
@@ -35,14 +35,14 @@ type LockableConnectionHandler struct {
 	sync.RWMutex
 	Upgrader  websocket.Upgrader
 	Broadcast chan Message
-	M         map[*websocket.Conn]uuid.UUID
+	M         map[*websocket.Conn]string
 	Hooks     []Hook
 }
 
 // Hook to be called by LockableConnectionHandler in websocket lifecycle
 type Hook struct {
-	OnConnection func(uuid.UUID) *Message
-	OnClose      func(uuid.UUID) *Message
+	OnConnection func(string) *Message
+	OnClose      func(string) *Message
 	Events       Events
 	OnEvent      func(*Message) *Message
 }

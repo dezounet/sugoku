@@ -35,7 +35,7 @@ func TestGetUsers(t *testing.T) {
 		Users: &testUsers,
 	}
 
-	uuid := uuid.New()
+	uuid := uuid.New().String()
 	name := "test"
 	user := users.User{
 		UUID: uuid,

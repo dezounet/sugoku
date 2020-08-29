@@ -13,6 +13,7 @@ func TestGridEvents(t *testing.T) {
 
 	expectedEvents := []websocket.Event{
 		websocket.GRIDUPDATE,
+		websocket.GRIDRESET,
 	}
 
 	for _, event := range expectedEvents {

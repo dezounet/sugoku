@@ -17,7 +17,12 @@ var messageSizeLimit = int64(1024)
 // No specific option is passed to this upgrader, modify here if you want
 // to adapt the Upgrader behaviour
 func getUpgrader() websocket.Upgrader {
-	return websocket.Upgrader{}
+	return websocket.Upgrader{
+		// Uncomment these lines to allow request from any location
+		// CheckOrigin: func(r *http.Request) bool {
+		// 	return true
+		// },
+	}
 }
 
 // GetHandler instanciate and return an http request handler to promote
@@ -26,7 +31,7 @@ func GetHandler() LockableConnectionHandler {
 	return LockableConnectionHandler{
 		Upgrader:  getUpgrader(),
 		Broadcast: make(chan Message),
-		M:         make(map[*websocket.Conn]uuid.UUID),
+		M:         make(map[*websocket.Conn]string),
 		Hooks:     make([]Hook, 0),
 	}
 }
@@ -42,10 +47,10 @@ func (h *LockableConnectionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	// Upgrade initial GET request to a websocket
 	ws, err := h.Upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 	} else {
 		h.Lock()
-		h.M[ws] = UUID
+		h.M[ws] = UUID.String()
 		h.Unlock()
 
 		// Limit max message size to prevent DoS
@@ -58,8 +63,9 @@ func (h *LockableConnectionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	// Iterate over hooks to perform OnConnection actions
 	for _, hook := range h.Hooks {
 		if hook.OnConnection != nil {
-			msg := hook.OnConnection(UUID)
+			msg := hook.OnConnection(UUID.String())
 			if msg != nil {
+
 				h.Broadcast <- *msg
 			}
 		}
@@ -67,6 +73,7 @@ func (h *LockableConnectionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 
 	for {
 		// Read in a new message as JSON and map it to a Message object
+		// var msg Message
 		var msg Message
 		err := ws.ReadJSON(&msg)
 		if err != nil {
@@ -75,6 +82,8 @@ func (h *LockableConnectionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 			return
 		}
 
+		// Set current user
+		msg.UUID = UUID.String()
 		h.Broadcast <- msg
 	}
 }
@@ -112,6 +121,7 @@ func HandleMessages(handler *LockableConnectionHandler) {
 		msg := <-handler.Broadcast
 
 		// Trigger event processing for every hooks
+		log.Println("broadcasting", msg)
 		for _, hook := range handler.Hooks {
 			// Only trigger if the current hook is interested in this event
 			if _, ok := hook.Events[msg.Event]; ok {
@@ -143,5 +153,5 @@ func broadcastMessage(handler *LockableConnectionHandler, msg *Message) {
 			closeConnection(handler, ws)
 		}
 	}
-	handler.Unlock()
+	handler.RUnlock()
 }

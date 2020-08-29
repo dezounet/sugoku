@@ -5,17 +5,17 @@ import (
 
 	"github.com/dezounet/sugokud/internal/users"
 	"github.com/dezounet/sugokud/internal/websocket"
-	"github.com/google/uuid"
+	"github.com/mitchellh/mapstructure"
 )
 
 // CreateUserHook instanciate and return hook for LockableConnectionHandler,
 // binding it to the input argument
 func CreateUserHook(users *users.LockableUsers) websocket.Hook {
 	return websocket.Hook{
-		OnConnection: func(UUID uuid.UUID) *websocket.Message {
+		OnConnection: func(UUID string) *websocket.Message {
 			return addUser(users, UUID, "unnamed user")
 		},
-		OnClose: func(UUID uuid.UUID) *websocket.Message {
+		OnClose: func(UUID string) *websocket.Message {
 			return removeUser(users, UUID)
 		},
 		Events: websocket.Events{
@@ -29,7 +29,7 @@ func CreateUserHook(users *users.LockableUsers) websocket.Hook {
 	}
 }
 
-func addUser(lockableUsers *users.LockableUsers, UUID uuid.UUID, name string) *websocket.Message {
+func addUser(lockableUsers *users.LockableUsers, UUID string, name string) *websocket.Message {
 	var msg *websocket.Message
 
 	// Add new user to users. If UUID is already known, do nothing
@@ -51,10 +51,10 @@ func addUser(lockableUsers *users.LockableUsers, UUID uuid.UUID, name string) *w
 	return msg
 }
 
-func removeUser(lockableUsers *users.LockableUsers, UUID uuid.UUID) *websocket.Message {
+func removeUser(lockableUsers *users.LockableUsers, UUID string) *websocket.Message {
 	var msg *websocket.Message
 
-	_, ok := lockableUsers.Get(UUID)
+	user, ok := lockableUsers.Get(UUID)
 	if ok {
 		// Delete user from users
 		lockableUsers.Remove(UUID)
@@ -62,7 +62,10 @@ func removeUser(lockableUsers *users.LockableUsers, UUID uuid.UUID) *websocket.M
 		// Broadcast to other clients
 		msg = &websocket.Message{
 			Event: websocket.USERDEL,
-			Data:  UUID,
+			Data: users.User{
+				UUID: user.UUID,
+				Name: user.Name,
+			},
 		}
 	}
 
@@ -71,15 +74,24 @@ func removeUser(lockableUsers *users.LockableUsers, UUID uuid.UUID) *websocket.M
 
 func onUserEvent(lockableUsers *users.LockableUsers, msg *websocket.Message) *websocket.Message {
 	var returnMsg *websocket.Message
-	user, ok := msg.Data.(users.User)
-	if ok {
+
+	var user users.User
+	err := mapstructure.Decode(msg.Data, &user)
+	if err == nil {
 		switch msg.Event {
 		case websocket.USERADD:
 			returnMsg = addUser(lockableUsers, user.UUID, user.Name)
 		case websocket.USERUPDATE:
-			if _, ok := lockableUsers.Get(user.UUID); ok {
-				lockableUsers.AddOrUpdate(user)
+			if _, ok := lockableUsers.Get(msg.UUID); ok {
+				// make sure uuid is set by server
+				user.UUID = msg.UUID
+				msg.Data = user
 				returnMsg = msg
+
+				// save state locally
+				lockableUsers.AddOrUpdate(user)
+			} else {
+				log.Println("Failed to update unknown user", msg.UUID)
 			}
 		case websocket.USERDEL:
 			returnMsg = removeUser(lockableUsers, user.UUID)
@@ -87,7 +99,7 @@ func onUserEvent(lockableUsers *users.LockableUsers, msg *websocket.Message) *we
 			log.Printf("error[%s]: event not handled", msg.Event)
 		}
 	} else {
-		log.Printf("error[%s]: malformed message - %v", msg.Event, msg.Data)
+		log.Printf("error[%s]: malformed message - %v because %s", msg.Event, msg.Data, err)
 	}
 
 	return returnMsg

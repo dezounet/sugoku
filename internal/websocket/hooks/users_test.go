@@ -28,7 +28,7 @@ func TestUsersEvents(t *testing.T) {
 func TestOnUserConnection(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 
 	msg := hook.OnConnection(UUID)
 	if msg == nil {
@@ -59,7 +59,7 @@ func TestOnUserConnection(t *testing.T) {
 func TestOnUserSecondConnection(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 
 	msg := hook.OnConnection(UUID)
 	msg = hook.OnConnection(UUID)
@@ -80,7 +80,7 @@ func TestOnUserSecondConnection(t *testing.T) {
 func TestOnUserClose(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 
 	msg := hook.OnConnection(UUID)
 	msg = hook.OnClose(UUID)
@@ -91,11 +91,11 @@ func TestOnUserClose(t *testing.T) {
 		t.Fatal("Expecting event", websocket.USERDEL, "got", msg.Event)
 	}
 
-	typedMessage, ok := msg.Data.(uuid.UUID)
+	typedMessage, ok := msg.Data.(users.User)
 	if !ok {
 		t.Fatal("Expecting User structure, can't cast it:", msg.Data)
 	}
-	if typedMessage != UUID {
+	if typedMessage.UUID != UUID {
 		t.Fatal("Expecting UUID", UUID, "got", typedMessage)
 	}
 
@@ -107,7 +107,7 @@ func TestOnUserClose(t *testing.T) {
 func TestOnUserSecondClose(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 
 	msg := hook.OnConnection(UUID)
 	msg = hook.OnClose(UUID)
@@ -124,7 +124,7 @@ func TestOnUserSecondClose(t *testing.T) {
 func TestOnUserAddEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
@@ -153,7 +153,7 @@ func TestOnUserAddEvent(t *testing.T) {
 func TestOnUserSecondAddEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
@@ -183,11 +183,12 @@ func TestOnUserSecondAddEvent(t *testing.T) {
 func TestOnUserUpdateEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
 		Event: websocket.USERUPDATE,
+		UUID:  UUID,
 		Data: users.User{
 			UUID: UUID,
 			Name: name,
@@ -213,11 +214,12 @@ func TestOnUserUpdateEvent(t *testing.T) {
 func TestOnUserSecondUpdateEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
 		Event: websocket.USERUPDATE,
+		UUID:  UUID,
 		Data: users.User{
 			UUID: UUID,
 			Name: name,
@@ -244,7 +246,7 @@ func TestOnUserSecondUpdateEvent(t *testing.T) {
 func TestUserOnDelEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
@@ -269,7 +271,7 @@ func TestUserOnDelEvent(t *testing.T) {
 func TestOnUserSecondDelEvent(t *testing.T) {
 	testUsers := users.Create()
 	hook := CreateUserHook(&testUsers)
-	UUID := uuid.New()
+	UUID := uuid.New().String()
 	name := "test"
 
 	testMsg := websocket.Message{
@@ -299,7 +301,7 @@ func TestUserUnknownEvent(t *testing.T) {
 	testMsg := websocket.Message{
 		Event: "unknown",
 		Data: users.User{
-			UUID: uuid.New(),
+			UUID: uuid.New().String(),
 			Name: "test",
 		},
 	}

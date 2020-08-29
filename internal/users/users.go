@@ -1,9 +1,5 @@
 package users
 
-import (
-	"github.com/google/uuid"
-)
-
 // Create an empty instance of LockableUsers
 func Create() LockableUsers {
 	return LockableUsers{
@@ -19,14 +15,14 @@ func (users *LockableUsers) AddOrUpdate(user User) {
 }
 
 // Remove a User from the users
-func (users *LockableUsers) Remove(UUID uuid.UUID) {
+func (users *LockableUsers) Remove(UUID string) {
 	users.Lock()
 	delete(users.data, UUID)
 	users.Unlock()
 }
 
 // Get a specific User, or nil if it does not exist
-func (users *LockableUsers) Get(UUID uuid.UUID) (User, bool) {
+func (users *LockableUsers) Get(UUID string) (User, bool) {
 	users.RLock()
 	user, ok := users.data[UUID]
 	users.RUnlock()

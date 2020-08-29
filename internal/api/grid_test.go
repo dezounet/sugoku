@@ -7,7 +7,6 @@ import (
 
 	"github.com/dezounet/sugokud/internal/websocket"
 	"github.com/dezounet/sugokud/pkg/sudoku"
-	"github.com/google/uuid"
 )
 
 func TestGetEmptyGrid(t *testing.T) {
@@ -71,7 +70,7 @@ func TestGetGridUUID(t *testing.T) {
 	rec := httptest.NewRecorder()
 	handler.ServeHTTP(rec, nil)
 
-	var data uuid.UUID
+	var data string
 	err := json.Unmarshal(rec.Body.Bytes(), &data)
 	if err != nil {
 		t.Fatal("Failed to understand response:", rec.Body.String())
