@@ -7,6 +7,7 @@ import (
 
 	"github.com/dezounet/sugokud/internal/websocket"
 	"github.com/dezounet/sugokud/pkg/sudoku"
+	"github.com/go-redis/redis/v8"
 )
 
 // GetGridHandler to serve HTTP GET request on sudoku grid
@@ -51,6 +52,7 @@ func (handler *GetGridUUIDHandler) ServeHTTP(w http.ResponseWriter, r *http.Requ
 type GetGridResetHandler struct {
 	Grid      *sudoku.Grid
 	Broadcast chan websocket.Message
+	Redis     *redis.Client
 }
 
 func (handler *GetGridResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -67,8 +69,18 @@ func (handler *GetGridResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 		} else if difficultyParams == "nightmare" {
 			difficulty = sudoku.NIGHTMARE
 		}
+
 		// Initialize a new Grid
 		handler.Grid.Initialize(difficulty)
+
+		// Increment solved grid counter
+		ok := sudoku.IncrementCounter(handler.Redis)
+		if !ok {
+			log.Println(
+				"Failed to increment solved grid counter,",
+				"this solved grid will not be added to total count",
+			)
+		}
 
 		// Send response
 		json, err := json.Marshal("OK")
@@ -90,5 +102,24 @@ func (handler *GetGridResetHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	} else {
 		http.Error(w, http.StatusText(http.StatusForbidden),
 			http.StatusForbidden)
+	}
+}
+
+// GetGridCounter to serve HTTP GET request to get the number of sudoku grid solved
+type GetGridCounter struct {
+	Redis *redis.Client
+}
+
+func (handler *GetGridCounter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	setHeader(w.Header())
+
+	count := sudoku.GetCounter(handler.Redis)
+	json, err := json.Marshal(count)
+	if err != nil {
+		log.Println("Failed getting grid UUID: ", err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError),
+			http.StatusInternalServerError)
+	} else {
+		w.Write(json)
 	}
 }

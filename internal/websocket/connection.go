@@ -20,7 +20,7 @@ func getUpgrader() websocket.Upgrader {
 	return websocket.Upgrader{
 		// Uncomment these lines to allow request from any location
 		// CheckOrigin: func(r *http.Request) bool {
-		// 	return true
+		// return true
 		// },
 	}
 }
@@ -89,25 +89,27 @@ func (h *LockableConnectionHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 }
 
 func closeConnection(h *LockableConnectionHandler, ws *websocket.Conn) {
-	// Close connection to prevent any new message from this client
-	ws.Close()
+	if ws != nil {
+		// Close connection to prevent any new message from this client
+		ws.Close()
 
-	// Get client UUID
-	h.RLock()
-	UUID := h.M[ws]
-	h.RUnlock()
+		// Get client UUID
+		h.RLock()
+		UUID := h.M[ws]
+		h.RUnlock()
 
-	// Delete the corresponding websocket entry
-	h.Lock()
-	delete(h.M, ws)
-	h.Unlock()
+		// Delete the corresponding websocket entry
+		h.Lock()
+		delete(h.M, ws)
+		h.Unlock()
 
-	// Iterate over hooks to perform OnClose actions
-	for _, hook := range h.Hooks {
-		if hook.OnConnection != nil {
-			msg := hook.OnClose(UUID)
-			if msg != nil {
-				h.Broadcast <- *msg
+		// Iterate over hooks to perform OnClose actions
+		for _, hook := range h.Hooks {
+			if hook.OnConnection != nil {
+				msg := hook.OnClose(UUID)
+				if msg != nil {
+					h.Broadcast <- *msg
+				}
 			}
 		}
 	}
